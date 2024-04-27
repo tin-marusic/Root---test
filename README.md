@@ -1,2 +1,3 @@
 # Python file koji čita podatke iz root filea - u ovome slucaju simulacije prolaska fotona kroz HGCAL detektor
-Iz tih podataka izrađuje histograme za svaki layer zasebno te ih sprema u mapu 'Plotovi'
+U fileu start.py odabiremo event, kod automatski izrađuje histograme za sve layere 
+Također na plotu se ispisuje i energija fotona koji je postojao u simulaciji
