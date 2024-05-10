@@ -48,11 +48,12 @@ def plot_hexagon(list_x, list_y, list_e, i):
     else:
         ht = plt.hexbin(list_y, list_x, C=list_e, cmap='plasma', gridsize=23, vmax=(np.max(list_e)), vmin=np.min(list_e) - 0.05,extent=[-125,125,-125,125])
     #print(f"{i}. : {list_x},{list_y}")
+    plt.plot(y, x, 'rx')  # 'rx' specifies red color ('r') and 'x' marker
     cb = plt.colorbar(ht)  
     cb.set_label("Energy value")
     plt.xlabel("ts_y")
     plt.ylabel("ts_x")
-    plt.title(f"ts_y:ts_x:ts_energy   |   ts_layer == {i}, event == {event} \n gen_energy = {gen_energy:.4f}    |    gen_pt = {gen_pt:.4f} \n Coordinates of photon entry (mm): ({x},{y},{z})", fontsize=9)
+    plt.title(f"ts_y:ts_x:ts_energy   |   ts_layer == {i}, event == {event} \n gen_energy = {gen_energy:.4f}    |    gen_pt = {gen_pt:.4f} \n Coordinates of photon entry (mm): ({x},{y})", fontsize=9)
     plt.savefig(f"Plots/plot{i}.png")
     plt.clf()
         
@@ -62,14 +63,14 @@ def find_coord(eta, phi, z): # Determining the position of photon entry
     x = np.round(r * np.cos(phi), 2)
     y = np.round(r * np.sin(phi), 2)
     
-    return x, y 
+    return x, y     
     
 delete_files_from_directory("Plots")
 delete_files_from_directory("Overlaps")
 
-event = 4674
-z = 3219.47 # Distance of the 1st layer from the origin of the HGCal detector
-
+event = 5332
+z_0 = 321.947 # Distance of the 1st layer from the origin of the HGCal detector
+z = z_0
 event_index = get_index(branches["event"], event)[0] # Getting the layer index, which is unique in the layers branch
 ts_layer = np.asarray(branches["ts_layer"][event_index]) # Converting to numpy array
 
@@ -81,7 +82,6 @@ gen_pt = branches["gen_pt"][event_index][gen_eta_index]
 # Calculating coordinates of photon entry 
 eta = branches["gen_eta"][event_index][gen_eta_index]
 phi = branches["gen_phi"][event_index][gen_eta_index]
-x, y = find_coord(eta, phi, z)
 
 # Calculating minimum and maximum
 min_layer = np.min(ts_layer)
@@ -137,7 +137,11 @@ for i in range(min_layer, max_layer+1):
         # Deleting empty files - layers where there was no overlap
         if os.path.getsize(f"Overlaps/overlaps_layer_{i}.txt") == 0:
             os.remove(f"Overlaps/overlaps_layer_{i}.txt")
-        
+        x, y = find_coord(eta, phi, z)
         plot_hexagon(list_x, list_y, list_e, i)
+        
+        z += 0.42 #increse of z distance beetween layers
+
+x, y = find_coord(eta, phi, z_0)
 plot_hexagon(sum_list_x, sum_list_y, sum_list_e, "sum of all")  
   
